@@ -1,0 +1,59 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # Pure-Python path: no Rust toolchain. Exercises the fallback kernel on every
+  # supported OS / interpreter. This is the contract that the library runs
+  # end-to-end without the compiled extension.
+  test:
+    name: tests (${{ matrix.os }} / py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.9", "3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --upgrade pip pytest hypothesis jellyfish
+      - run: pytest -q
+
+  # Accelerated path: build the Rust kernel and re-run the same suite so the
+  # compiled code is covered too.
+  test-accel:
+    name: tests + rust kernel
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - uses: dtolnay/rust-toolchain@stable
+      - run: python -m pip install --upgrade pip maturin pytest hypothesis jellyfish
+      - run: maturin develop --manifest-path rust/typosquat_core/Cargo.toml
+      - run: python -c "import typosquat; assert typosquat.HAVE_RUST, 'kernel not loaded'; print('rust kernel: ON')"
+      - run: pytest -q
+
+  lint:
+    name: lint & types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --upgrade pip ruff mypy
+      - run: ruff check python tests
+      - run: ruff format --check python tests
+      - run: mypy python/typosquat || true  # advisory until fully typed

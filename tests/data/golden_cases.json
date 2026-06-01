@@ -1,0 +1,36 @@
+{
+  "_comment": "Stable membership expectations for the generator. Edit intentionally; these back tests/test_golden.py.",
+  "cases": [
+    {
+      "target": "requests",
+      "ecosystem": "pypi",
+      "must_include": ["requets", "request", "reqests"],
+      "must_exclude_normalized": ["requests"]
+    },
+    {
+      "target": "cross-env",
+      "ecosystem": "npm",
+      "must_include": ["crossenv", "cross_env"]
+    },
+    {
+      "target": "cross-env",
+      "ecosystem": "pypi",
+      "must_exclude": ["cross_env", "cross.env"]
+    },
+    {
+      "target": "vue-router",
+      "ecosystem": "npm",
+      "must_include": ["router-vue"]
+    },
+    {
+      "target": "lodash",
+      "ecosystem": "npm",
+      "must_include": ["lodash-js", "node-lodash"]
+    },
+    {
+      "target": "foo-bar",
+      "ecosystem": "crates",
+      "must_exclude": ["foo_bar"]
+    }
+  ]
+}

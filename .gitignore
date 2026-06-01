@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Rust
+/target/
+rust/**/target/
+**/*.rs.bk
+Cargo.lock
+
+# Maturin build artifacts
+python/typosquat/_core*.so
+python/typosquat/_core*.pyd
+*.dylib
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Paper build
+docs/paper/*.aux
+docs/paper/*.log
+docs/paper/*.out
+docs/paper/*.pdf

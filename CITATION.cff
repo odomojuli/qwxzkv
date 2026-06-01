@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+title: "qwxzkv: comprehensive ecosystem-parametric enumeration of package-name confusion"
+message: "If you use this software or the framework, please cite it."
+type: software
+authors:
+  - name: "qwxzkv contributors"
+repository-code: "https://github.com/odomojuli/qwxzkv"
+license: Apache-2.0
+version: 0.1.0
+keywords:
+  - typosquatting
+  - package confusion
+  - supply chain security
+preferred-citation:
+  type: article
+  title: "A Generative Framework for Comprehensive Package-Name Confusion Enumeration"
+  status: in-preparation
+  authors:
+    - name: "qwxzkv contributors"
+  year: 2026

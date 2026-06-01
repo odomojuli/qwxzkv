@@ -1,0 +1,75 @@
+[build-system]
+requires = ["maturin>=1.5,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "qwxzkv"
+version = "0.1.0"
+description = "qwxzkv enumerates every name an attacker could register to impersonate a package on PyPI, npm, or crates, then ranks each by risk. Transform families generate the confusion set; edit, Jaccard, visual, phonetic, and keyboard-Fréchet metrics score it. Ecosystem-aware, provably complete for the typing channel — named for the one name it can't squat."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "Apache-2.0" }
+authors = [{ name = "qwxzkv contributors" }]
+keywords = [
+    "typosquatting",
+    "supply-chain-security",
+    "package-confusion",
+    "pypi",
+    "npm",
+    "crates",
+    "security",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Rust",
+    "Topic :: Security",
+    "Topic :: Software Development :: Quality Assurance",
+]
+# The pure-Python core has NO hard runtime dependencies.
+dependencies = []
+
+[project.optional-dependencies]
+# Better phonetic codes (double metaphone) than the built-in soundex fallback.
+phonetic = ["jellyfish>=1.0"]
+test = ["pytest>=7.0", "hypothesis>=6.0", "jellyfish>=1.0"]
+dev = ["maturin>=1.5,<2.0", "ruff>=0.4", "mypy>=1.8", "pytest>=7.0", "hypothesis>=6.0", "jellyfish>=1.0"]
+
+[project.scripts]
+qwxzkv = "typosquat.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/odomojuli/qwxzkv"
+Documentation = "https://github.com/odomojuli/qwxzkv/tree/main/docs"
+Repository = "https://github.com/odomojuli/qwxzkv"
+Issues = "https://github.com/odomojuli/qwxzkv/issues"
+
+[tool.maturin]
+# Mixed Python/Rust layout. Pure-Python sources live under python/; the optional
+# compiled acceleration kernel is installed as the submodule typosquat._core.
+python-source = "python"
+module-name = "typosquat._core"
+manifest-path = "rust/typosquat_core/Cargo.toml"
+features = ["pyo3/extension-module"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.9"
+warn_unused_ignores = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+# Note: sys.path wiring is handled by the repo-root conftest.py so that tests run
+# against the pure-Python source when the package is not installed, and against
+# the installed package (with the Rust kernel) when it is.
+testpaths = ["tests"]
+filterwarnings = ["error"]
