@@ -1,9 +1,17 @@
 """Empirical coverage matrix.
 
-Every attack category in the USENIX Security 2023 package-confusion taxonomy must
-map to at least one *registered* transform family that actually generates a
-candidate. An unmapped or non-producing category is a coverage gap. This is the
-test backing the matrix in ``docs/taxonomy.md``.
+Every *orthographic or structural* category in the USENIX Security 2023
+package-confusion taxonomy (Neupane et al.) must map to at least one *registered*
+transform family that actually generates a candidate. An unmapped or non-producing
+category among those is a coverage gap. This is the test backing the matrix in
+``docs/taxonomy.md``.
+
+Deliberately NOT enforced here (a generator cannot produce them; see
+``docs/research/measurement-methodology.md``): Neupane's Semantic substitution (#6),
+Asemantic substitution (#7), and Alternate spelling (#10) are the semantic frontier,
+and Familiar term abuse (#13) is targetless. Grammatical substitution (#4) is only
+partially covered (plural, not verbal forms). These are the bounded frontier, not
+silent gaps.
 """
 
 import pytest

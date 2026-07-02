@@ -102,30 +102,45 @@ it is absent from the current coverage tests. When implemented it needs a new
 
 ## Coverage matrix vs. the empirical taxonomy
 
-Each row is an attack category from **Neupane et al., "Beyond Typosquatting: An
-In-depth Look at Package Confusion," USENIX Security 2023** (1200+ real attacks across
-13 confusion categories; the taxonomy predates slopsquatting, which we handle in
-Channel E below).
-Every category must map to ≥1 generating family — an unmapped row is a coverage
-gap and a failing test (`tests/test_coverage.py`).
+Each row is one of the **13 categories** in **Neupane et al., "Beyond Typosquatting:
+An In-depth Look at Package Confusion," USENIX Security 2023** (1232 documented attacks;
+the released artifact reports 1,239 confirmed pairs). Categories are listed in the
+paper's priority order. The disposition column is the honest accounting: a *covered*
+category maps to a generating family; a *frontier* category is semantic and cannot be
+produced by an edit/structural generator; a *targetless* category has no target package
+to generate from. See [`../research/measurement-methodology.md`](../research/measurement-methodology.md)
+for the full pull, prevalence, and detection-method comparison. Only the covered and
+partial rows are enforced by `tests/test_coverage.py`.
 
-| Empirical category | Generating family / families |
-|--------------------|------------------------------|
-| Typosquatting (1–2 edits) | `omission`, `insertion`, `duplication`, `substitution`, `transposition`, `keyboard_*`, `vowel_swap` |
-| Combosquatting (added words) | `affix_combo` |
-| Simplification (dropped words) | `simplification` |
-| Delimiter / separator modification | `separator_swap`, `separator_insert`, `separator_delete` |
-| Sequence / word-order confusion | `token_reorder` |
-| Scope confusion (npm) | `scope_manipulate` |
-| Homophone / phonetic | `homophone` |
-| Homographic / visual | `homoglyph`, `unicode_confusable` |
-| Grammatical (singular/plural) | `grammatical_number` |
-| Dependency confusion (cross-registry, same name) | *registry dimension* — `scope_manipulate` + the cross-ecosystem mode (roadmap §) |
+| # | Neupane category | Generating family | Disposition |
+|---|------------------|-------------------|-------------|
+| 1 | Prefix/suffix augmentation | `affix_combo` | covered (bounded by lexicon) |
+| 2 | Sequence reordering | `token_reorder` | covered |
+| 3 | Delimiter modification | `separator_swap/insert/delete` | covered (E-gated) |
+| 4 | Grammatical substitution | `grammatical_number` | **partial** — we do plural only; Neupane lemmatizes verbal forms too |
+| 5 | Scope confusion | `scope_manipulate` | covered (npm) |
+| 6 | Semantic substitution | — | **frontier** — synonym swap (`bz2file`→`bzip`); needs embeddings |
+| 7 | Asemantic substitution | — | **frontier** — familiar-but-unrelated swap (`libcurl`→`pycurl`) |
+| 8 | Homophonic similarity | `homophone` | covered |
+| 9 | Simplification | `simplification` | covered |
+| 10 | Alternate spelling | — | **frontier** — regional spelling; needs a Br/Am lexicon |
+| 11 | Homographic replacement | `homoglyph` | covered (ASCII look-alikes) |
+| 12 | 1-step Damerau/Levenshtein | Channel A (`omission`, `insertion`, `substitution`, `transposition`, `keyboard_*`, `vowel_swap`) | covered (provable closure) |
+| 13 | Familiar term abuse | — | **out of scope** — no target package (brand/tech term) |
 
-> Dependency confusion is partly **out of scope of name generation**: it reuses
-> an *identical* internal name on a public registry. The library surfaces it via
-> the cross-ecosystem mode (same name, different `E`) rather than a name
-> transform; tracked explicitly so the matrix has no silent gap.
+Tally: **8 covered, 1 partial, 3 semantic frontier (6, 7, 10), 1 targetless (13)**. By
+graded-instance count (Neupane Table 3, `#TP+#FN`) the three unreachable semantic
+categories are ~1.1% of instances, so generation reaches ~98.9% of graded instances —
+but that number is **campaign-skewed** (722/1232 attacks are one RubyGems delimiter
+campaign; Delimiter + Scope alone are 92% of graded positives), so recall must be
+reported stratified by campaign, not as a bare percentage.
+
+> **Dependency confusion is not one of Neupane's 13 categories** (it is Birsan's
+> input-driven class: an *identical* internal name republished on a public registry). It
+> is deliberately absent from this matrix and surfaced instead via the cross-ecosystem
+> identity mode (same name, different `E`) with the defender's private-name list as
+> input, exactly as `../paper/related_work.md` states. An earlier version of this matrix
+> wrongly listed it as a Neupane row.
 
 ## Beyond the 2023 taxonomy: the hallucination channel
 

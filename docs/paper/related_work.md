@@ -10,11 +10,15 @@ attack-corpus context and the source for every claim is in
 ## Package-confusion measurement & taxonomy
 
 - **Neupane, Holmes, Wyss, Davidson, De Carli, "Beyond Typosquatting: An In-depth
-  Look at Package Confusion," USENIX Security 2023, pp. 3439-3456.** Defines 13
-  categories of package confusion over a dataset of 1200+ documented attacks (the
-  "1232" figure is in the paper body; **[verify]** the exact integer). The taxonomy
-  we adopt as our empirical coverage target.
-  <https://www.usenix.org/system/files/usenixsecurity23-neupane.pdf>
+  Look at Package Confusion," USENIX Security 2023, pp. 3439-3456.** Defines **13**
+  categories of package confusion (12 target-based + targetless Familiar term abuse) over
+  **1232** documented attacks (integer resolved; the released artifact reports 1,239
+  confirmed pairs). Distribution is campaign-skewed: 722/1232 are one RubyGems delimiter
+  campaign; 1077/1232 fall in 7 campaigns. Rules 1-11 (semantic-leaning) are 82% of labels,
+  43% excluding the RubyGems campaign. Our empirical coverage target; see
+  `../research/measurement-methodology.md` for the category-by-category mapping and the
+  three categories our generator deliberately does not reach.
+  <https://www.usenix.org/conference/usenixsecurity23/presentation/neupane>
 - **Vu, Pashchenko, Massacci, Plate, Sabetta, "Typosquatting and Combosquatting
   Attacks on the Python Ecosystem," IEEE EuroS&PW 2020, pp. 509-514.** PyPI-focused
   measurement; motivates the structural families.
@@ -61,11 +65,15 @@ what lies beyond it (the hallucination channel below).
 - **pypi-scan (IQTLabs).** PyPI typosquat scanner: Levenshtein <= 1 plus a Metaphone
   phonetic check. Archived January 2023.
   <https://github.com/IQTLabs/pypi-scan>
-- **ConfuGuard (Jiang, Cakar, Lysenko, Davis), arXiv:2502.20528 (2025).**
-  Metadata-based detection of active package confusion at scale across 7 registries;
-  reduces the ~80% false-positive rate of purely lexical name-confusion candidate
-  generation. Formerly titled "TypoSmart"; arXiv-only as of July 2026.
-  <https://arxiv.org/abs/2502.20528>
+- **ConfuGuard (Jiang, Cakar, Lysenko, Davis; Purdue + Socket), arXiv:2502.20528 (v3).**
+  Metadata-based detection of active *and stealthy* package confusion across 7 registries.
+  Adds a benignity filter (15 metadata rules, LLM-as-Judge on o4-mini) that cuts the
+  false-positive rate of pure name-similarity flagging **from 79.9% to 28%** (the 79.9%
+  is the benign fraction of a manual sample from Neupane's 640,482 flagged pairs, NPM/
+  PyPI/RubyGems — not a 7-registry figure). Extends Neupane's taxonomy with 3 hierarchical
+  patterns (impersonation, compound, domain confusion); releases ConfuDB (2,361 triaged
+  threats); 630 attacks confirmed in Socket production. Name evolution: v1 **TypoSmart** ->
+  v2/v3 ConfuGuard. arXiv-only as of July 2026. <https://arxiv.org/abs/2502.20528>
 - **Taylor, Vaidya, Davidson, De Carli, Rastogi, "SpellBound / typogard: Defending
   Against Package Typosquatting," arXiv:2003.03471 (2020).** Client-side
   transformation checks with a popularity gate; reports a 0.5% false-positive rate.
